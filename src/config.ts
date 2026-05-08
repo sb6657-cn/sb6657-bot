@@ -61,17 +61,17 @@ const RouletteConfig: Schema<RouletteConfig> = Schema.intersect([
             muteTime: Schema.number().min(0).default(300).description('中弹后禁言时间（秒），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
             msgHit: Schema.string()
                 .role('textarea')
-                .default('{at} 嘭！第 {chamber}/{total} 枪中彩了！被禁言 {time}！')
+                .default('Bang！第{chamber}/{total}枪抽中了！{at} 被杀死了！')
                 .description(
                     '中弹文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 禁言时长（格式化，取自 muteTime） | `{seconds}` 禁言秒数 | `{chamber}` 中弹时是第几枪 | `{total}` 弹巢总格数（取自 chambers）'
                 ),
             msgNewRound: Schema.string()
                 .role('textarea')
-                .default('弹巢重新装填完毕，共 {total} 格。')
+                .default('弹巢重新装填完毕，共{total}格。')
                 .description('中弹后追加的新一轮文案（留空则不发）。可用占位符：`{at}` 艾特触发用户 | `{total}` 新一轮弹巢总格数（取自 chambers）'),
             msgMiss: Schema.string()
                 .role('textarea')
-                .default('{at} 咔哒——空的。弹巢剩余 {remaining}/{total} 格……')
+                .default('{at} 咔哒——空的。弹巢剩余{remaining}/{total}格……')
                 .description('空枪文案。可用占位符：`{at}` 艾特触发用户 | `{chamber}` 刚开过的是第几枪 | `{remaining}` 本次开枪后剩余格数 | `{total}` 弹巢总格数（取自 chambers）'),
         }),
     ]),
@@ -147,4 +147,3 @@ export const Config: Schema<ConfigType> = Schema.object({
     repeatMute: RepeatMuteConfig,
     spamMute: SpamMuteConfig,
 });
-
