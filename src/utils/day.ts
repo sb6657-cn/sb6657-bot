@@ -5,21 +5,22 @@ export function easyFormatTime(string: string | undefined) {
 }
 
 /**
- * 把秒数格式化为「X 小时 Y 分 Z 秒」可读形式
- * @example formatDuration(90) → "01 分 30 秒"
+ * 把秒数格式化为「X小时Y分钟Z秒」可读形式，省略为 0 的单位
+ * @example formatDuration(90) → "1分钟30秒"
+ * @example formatDuration(3900) → "1小时5分钟"
+ * @example formatDuration(3630) → "1小时30秒"
  */
 export function formatDuration(seconds: number): string {
     const s = Math.max(0, Math.floor(seconds));
-    if (s < 60) {
-        return `${s.toString().padStart(2, '0')} 秒`;
-    }
-    if (s < 3600) {
-        const minutes = Math.floor(s / 60);
-        const remainingSeconds = s % 60;
-        return `${minutes.toString().padStart(2, '0')} 分 ${remainingSeconds.toString().padStart(2, '0')} 秒`;
-    }
     const hours = Math.floor(s / 3600);
     const minutes = Math.floor((s % 3600) / 60);
     const remainingSeconds = s % 60;
-    return `${hours.toString().padStart(2, '0')} 小时 ${minutes.toString().padStart(2, '0')} 分 ${remainingSeconds.toString().padStart(2, '0')} 秒`;
+
+    const parts: string[] = [];
+    if (hours > 0) parts.push(`${hours}小时`);
+    if (minutes > 0) parts.push(`${minutes}分钟`);
+    if (remainingSeconds > 0) parts.push(`${remainingSeconds}秒`);
+
+    if (parts.length === 0) return '0秒';
+    return parts.join('');
 }
