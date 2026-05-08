@@ -28,7 +28,7 @@ const RouletteConfig: Schema<RouletteConfig> = Schema.intersect([
         minInterval: Schema.number().default(600).description('指令触发的冷却时间 (毫秒)'),
         mode: Schema.union([
             Schema.const('probability').description('放回抽样（概率模式）：每次独立概率，空枪叠加时长'),
-            Schema.const('sequence').description('不放回抽样（弹轮模式）：固定弹膛数，每次开枪减少一格，直至中弹'),
+            Schema.const('sequence').description('不放回抽样（弹巢模式）：固定弹膛数，每次开枪减少一格，直至中弹'),
         ])
             .default('probability')
             .description('游戏模式'),
@@ -57,22 +57,22 @@ const RouletteConfig: Schema<RouletteConfig> = Schema.intersect([
         // —— 模式 B：不放回抽样 ——
         Schema.object({
             mode: Schema.const('sequence').required(),
-            chambers: Schema.number().min(1).default(6).description('弹轮格数（N 格中装 1 发子弹），无上限。对应占位符 `{total}`'),
+            chambers: Schema.number().min(1).default(6).description('弹巢格数（N 格中装 1 发子弹），无上限。对应占位符 `{total}`'),
             muteTime: Schema.number().min(0).default(300).description('中弹后禁言时间（秒），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
             msgHit: Schema.string()
                 .role('textarea')
                 .default('{at} 嘭！第 {chamber}/{total} 枪中彩了！被禁言 {time}！')
                 .description(
-                    '中弹文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 禁言时长（格式化，取自 muteTime） | `{seconds}` 禁言秒数 | `{chamber}` 中弹时是第几枪 | `{total}` 弹轮总格数（取自 chambers）'
+                    '中弹文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 禁言时长（格式化，取自 muteTime） | `{seconds}` 禁言秒数 | `{chamber}` 中弹时是第几枪 | `{total}` 弹巢总格数（取自 chambers）'
                 ),
             msgNewRound: Schema.string()
                 .role('textarea')
-                .default('弹匣重新装填完毕，共 {total} 格。')
-                .description('中弹后追加的新一轮文案（留空则不发）。可用占位符：`{at}` 艾特触发用户 | `{total}` 新一轮弹轮总格数（取自 chambers）'),
+                .default('弹巢重新装填完毕，共 {total} 格。')
+                .description('中弹后追加的新一轮文案（留空则不发）。可用占位符：`{at}` 艾特触发用户 | `{total}` 新一轮弹巢总格数（取自 chambers）'),
             msgMiss: Schema.string()
                 .role('textarea')
-                .default('{at} 咔哒——空的。弹轮剩余 {remaining}/{total} 格……')
-                .description('空枪文案。可用占位符：`{at}` 艾特触发用户 | `{chamber}` 刚开过的是第几枪 | `{remaining}` 本次开枪后剩余格数 | `{total}` 弹轮总格数（取自 chambers）'),
+                .default('{at} 咔哒——空的。弹巢剩余 {remaining}/{total} 格……')
+                .description('空枪文案。可用占位符：`{at}` 艾特触发用户 | `{chamber}` 刚开过的是第几枪 | `{remaining}` 本次开枪后剩余格数 | `{total}` 弹巢总格数（取自 chambers）'),
         }),
     ]),
 ]);
