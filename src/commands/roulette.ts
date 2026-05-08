@@ -94,7 +94,7 @@ export function useRouletteCommand(ctx: Context, config: ConfigType) {
                 });
             }
 
-            // ===== 模式 B：不放回抽样（弹轮） =====
+            // ===== 模式 B：不放回抽样（弹巢） =====
             if (roulette.mode === 'sequence' && status.kind === 'sequence') {
                 // 本枪打中吗？子弹位置 == 0 意味着"下一格就是子弹"
                 const hit = status.bulletIndex === 0;

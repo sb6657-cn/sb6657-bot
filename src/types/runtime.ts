@@ -11,7 +11,7 @@ export interface ProbStatus {
     time: number;
 }
 
-/** 不放回抽样（弹轮模式）的群状态 */
+/** 不放回抽样（弹巢模式）的群状态 */
 export interface SeqStatus {
     kind: 'sequence';
     /** 总格数 */
