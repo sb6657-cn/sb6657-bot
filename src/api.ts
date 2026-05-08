@@ -1,5 +1,5 @@
 import { Context } from 'koishi';
-import { searchMeme_req, searchMeme_res, RandomMeme } from './types';
+import type { searchMeme_req, searchMeme_res, RandomMeme } from './types/api';
 import { Res, post, get } from './utils/request';
 
 const BACK_END_URL = 'https://hguofichp.cn:10086';

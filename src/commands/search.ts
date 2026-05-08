@@ -1,13 +1,20 @@
 import { Context } from 'koishi';
-import { Config } from '../config';
+import type { ConfigType } from '../types/config';
 import { searchMemes } from '../api';
 
-export function useSearchCommand(ctx: Context, config: Config) {
+export function useSearchCommand(ctx: Context, config: ConfigType) {
     const logger = ctx.logger('sb6657-bot-search');
-    const absoluteMax = config.customLimits.reduce((max, item) => Math.max(max, item.maxUsage), config.defaultMaxUsage);
+    const { search } = config;
+
+    if (!search.enabled) {
+        logger.info('搜烂梗 指令已被禁用,跳过注册');
+        return;
+    }
+
+    const absoluteMax = search.customLimits.reduce((max, item) => Math.max(max, item.maxUsage), search.defaultMaxUsage);
 
     ctx.command('搜烂梗 <keyword:text>', '根据关键词搜索烂梗', {
-        minInterval: config.minInterval,
+        minInterval: search.minInterval,
         maxUsage: absoluteMax,
     })
         .userFields(['usage'])
@@ -16,8 +23,8 @@ export function useSearchCommand(ctx: Context, config: Config) {
             if (!keyword || !keyword.trim()) return '请输入搜索关键词';
             if (!session || !session.user) return '无法获取用户信息，请重试';
 
-            const customConfig = config.customLimits.find((c) => c.userId === session.userId);
-            const currentLimit = customConfig ? customConfig.maxUsage : config.defaultMaxUsage;
+            const customConfig = search.customLimits.find((c) => c.userId === session.userId);
+            const currentLimit = customConfig ? customConfig.maxUsage : search.defaultMaxUsage;
             const todayUsage = (session.user.usage && session.user.usage['搜烂梗']) || 0;
 
             if (todayUsage >= currentLimit) {

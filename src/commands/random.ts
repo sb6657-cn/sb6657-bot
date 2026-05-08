@@ -1,14 +1,20 @@
 import { Context } from 'koishi';
-import { Config } from '../config';
+import type { ConfigType } from '../types/config';
 import { getRandomMeme } from '../api';
 import { easyFormatTime } from '../utils/day';
 import { getDisplayTags } from '../utils/tag';
 
-export function useRandomCommand(ctx: Context, config: Config) {
+export function useRandomCommand(ctx: Context, config: ConfigType) {
     const logger = ctx.logger('sb6657-bot-random');
+    const { random } = config;
+
+    if (!random.enabled) {
+        logger.info('随机烂梗 指令已被禁用,跳过注册');
+        return;
+    }
 
     ctx.command('随机', '随机一条烂梗', {
-        minInterval: config.minInterval,
+        minInterval: random.minInterval,
     })
         .alias('random', '随机烂梗', '抽烂梗')
         .action(async ({ session }) => {
