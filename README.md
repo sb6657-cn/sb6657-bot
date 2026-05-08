@@ -37,7 +37,9 @@ yarn add ./external/sb6657-bot
 
 在 Koishi Web 管理端的插件配置里，找到 `sb6657-bot` 插件，按需配置并启用。
 
-面板按功能分组，每个分组第一项都是 **是否启用** 开关，可单独关闭而不影响其他功能。
+面板按功能分组，每个分组第一项都是 **是否启用** 开关，可单独开启 / 关闭而不影响其他功能。
+
+> **所有功能的 `enabled` 默认都是 `false`**：插件首次安装后所有指令和监听器都不会工作，需要在 Koishi 控制台手动逐项启用。
 
 ---
 
@@ -78,17 +80,17 @@ yarn add ./external/sb6657-bot
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | boolean | `true` | 是否启用本指令 |
-| `minInterval` | number | `5000` | 指令触发的冷却时间（毫秒） |
-| `defaultMaxUsage` | number | `10` | 普通群友每天的默认搜索次数 |
+| `enabled` | boolean | `false` | 是否启用本指令 |
+| `minInterval` | number | `1000` | 指令触发的冷却时间（毫秒） |
+| `defaultMaxUsage` | number | `50` | 普通群友每天的默认搜索次数 |
 | `customLimits` | array | `[]` | VIP 用户的自定义次数白名单（可添加多条），每项含 `userId` 和 `maxUsage` |
 
 ### 🎲 随机烂梗 指令 (`random`)
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | boolean | `true` | 是否启用本指令 |
-| `minInterval` | number | `5000` | 指令触发的冷却时间（毫秒） |
+| `enabled` | boolean | `false` | 是否启用本指令 |
+| `minInterval` | number | `1000` | 指令触发的冷却时间（毫秒） |
 
 ### 🔫 开枪（俄罗斯轮盘赌）指令 (`roulette`)
 
@@ -96,8 +98,8 @@ yarn add ./external/sb6657-bot
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | boolean | `true` | 是否启用本指令 |
-| `minInterval` | number | `0` | 指令触发的冷却时间（毫秒），`0` 不限 |
+| `enabled` | boolean | `false` | 是否启用本指令 |
+| `minInterval` | number | `600` | 指令触发的冷却时间（毫秒） |
 | `mode` | `'probability'` / `'sequence'` | `'probability'` | 游戏模式，两种模式互斥 |
 
 #### 模式 A：放回抽样（概率模式）
@@ -107,11 +109,11 @@ yarn add ./external/sb6657-bot
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
 | `probability` | number (0-1) | `0.2` | 每次中弹概率 |
-| `initTime` | number | `30` | 每轮初始禁言时间（秒），无上限 |
-| `timeStepMin` | number | `15` | 空枪后叠加的最小时间（秒），无上限 |
-| `timeStepMax` | number | `120` | 空枪后叠加的最大时间（秒），无上限 |
+| `initTime` | number | `180` | 每轮初始禁言时间（秒），无上限 |
+| `timeStepMin` | number | `60` | 空枪后叠加的最小时间（秒），无上限 |
+| `timeStepMax` | number | `180` | 空枪后叠加的最大时间（秒），无上限 |
 | `msgHit` | string | 见下 | 中弹文案 |
-| `msgNewRound` | string | `''`（留空不发） | 中弹后下一轮开始时追加的文案 |
+| `msgNewRound` | string | 见下（可清空，留空则不发） | 中弹后下一轮开始时追加的文案 |
 | `msgMiss` | string | 见下 | 空枪文案 |
 
 #### 模式 B：不放回抽样（弹轮模式）
@@ -133,7 +135,7 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 | 占位符 | 含义 | 适用模式 |
 |---|---|---|
 | `{at}` | 艾特触发命令的用户 | 全部 |
-| `{time}` | 格式化后的时长，如 `02 分 30 秒` | 全部 |
+| `{time}` | 格式化后的时长，如 `1分钟30秒` / `1小时5分钟` | 全部 |
 | `{seconds}` | 原始秒数 | 全部 |
 | `{chamber}` | 当前是第几枪（1-based） | 仅弹轮模式 |
 | `{remaining}` | 空枪后弹轮剩余格数 | 仅弹轮模式（`msgMiss`） |
@@ -141,8 +143,9 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 
 默认文案：
 
-- **概率模式 · 中弹**：`{at} 被杀死了！\n撒，让我们来开始新一轮的游戏吧。（上弹中）`
-- **概率模式 · 空枪**：`{at} 这枪空了，恭喜你躲过一劫！\n禁言时间将增加到 {time}！`
+- **概率模式 · 中弹**：`钢铁般的左键，无解的直架！{at} 被杀死了！`
+- **概率模式 · 新一轮**：`加油吧{at} ，我们科隆major干回来。下一轮初始禁言时长为{time}`
+- **概率模式 · 空枪**：`先瞄准再空枪。{at} 恭喜你躲过一劫！禁言时间将增加到{time}！`
 - **弹轮模式 · 中弹**：`{at} 嘭！第 {chamber}/{total} 枪中彩了！被禁言 {time}！`
 - **弹轮模式 · 空枪**：`{at} 咔哒——空的。弹轮剩余 {remaining}/{total} 格……`
 - **弹轮模式 · 新一轮**：`弹匣重新装填完毕，共 {total} 格。`
@@ -151,15 +154,15 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | boolean | `true` | 是否启用本指令 |
-| `minInterval` | number | `0` | 指令触发的冷却时间（毫秒），`0` 不限 |
+| `enabled` | boolean | `false` | 是否启用本指令 |
+| `minInterval` | number | `600` | 指令触发的冷却时间（毫秒） |
 | `minSeconds` | number | `21600`（6 小时） | 睡眠最短时长（秒），无上限 |
 | `maxSeconds` | number | `28800`（8 小时） | 睡眠最长时长（秒），无上限 |
 | `msgSleep` | string | 见下 | 睡觉文案 |
 
 文案占位符同"开枪通用占位符"：`{at}` / `{time}` / `{seconds}`。
 
-默认文案：`{at} 好好睡觉，{time} 后再醒来吧！`
+默认文案：`{at} 好好睡觉，{time}后再醒来吧！`
 
 ### 🔁 复读禁言 (`repeatMute`)
 
@@ -167,12 +170,12 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | boolean | `true` | 是否启用本功能（关闭后不再监听） |
+| `enabled` | boolean | `false` | 是否启用本功能（关闭后不再监听） |
 | `guildMode` | `'all'` / `'whitelist'` / `'blacklist'` | `'all'` | 群生效范围：所有群 / 白名单 / 黑名单 |
 | `guilds` | string[] | `[]` | 群号列表（白名单 / 黑名单模式下使用） |
-| `minTimes` | number | `5` | 触发禁言所需的最少重复次数 |
-| `muteSeconds` | number | `3600`（1 小时） | 基础禁言时长（**秒**），无上限。实际 = 此值 × 随机倍率 |
-| `maxDurationMultiplier` | number | `8` | 随机倍率上限（1 ~ 该值随机取整数） |
+| `minTimes` | number | `8` | 触发禁言所需的最少重复次数 |
+| `muteSeconds` | number | `60`（1 分钟） | 基础禁言时长（**秒**），无上限。实际 = 此值 × 随机倍率 |
+| `maxDurationMultiplier` | number | `5` | 随机倍率上限（1 ~ 该值随机取整数） |
 | `msgMute` | string | 见下 | 触发禁言时的提示文案 |
 
 #### 复读禁言文案占位符
@@ -180,13 +183,13 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 | 占位符 | 含义 |
 |---|---|
 | `{at}` | 艾特触发用户 |
-| `{time}` | 本次禁言时长（格式化，如 `08 小时 00 分 00 秒`） |
+| `{time}` | 本次禁言时长（格式化，如 `5分钟` / `1小时5分钟`） |
 | `{seconds}` | 本次禁言秒数 |
 | `{times}` | 触发所需重复次数（取自 `minTimes`） |
 | `{baseSeconds}` | 基础禁言秒数（取自 `muteSeconds`） |
 | `{multiplier}` | 本次随机倍率 |
 
-默认文案：`{at} 复读 {times} 次，被禁言 {time}！`
+默认文案：`检测到复读，已禁言{time}`
 
 ### 🚿 刷屏禁言 (`spamMute`)
 
@@ -194,12 +197,12 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | boolean | `true` | 是否启用本功能（关闭后不再监听） |
+| `enabled` | boolean | `false` | 是否启用本功能（关闭后不再监听） |
 | `guildMode` | `'all'` / `'whitelist'` / `'blacklist'` | `'all'` | 群生效范围：所有群 / 白名单 / 黑名单 |
 | `guilds` | string[] | `[]` | 群号列表（白名单 / 黑名单模式下使用） |
 | `windowSeconds` | number | `10` | 滑动时间窗口大小（秒），判定"最近 N 秒内" |
-| `threshold` | number | `8` | 触发阈值：窗口内消息数达到该值即触发 |
-| `muteSeconds` | number | `300` | 触发后禁言时长（**秒**），无上限 |
+| `threshold` | number | `5` | 触发阈值：窗口内消息数达到该值即触发 |
+| `muteSeconds` | number | `600`（10 分钟） | 触发后禁言时长（**秒**），无上限 |
 | `msgMute` | string | 见下 | 触发禁言时的提示文案 |
 
 #### 刷屏禁言文案占位符
@@ -213,7 +216,7 @@ N 格弹轮中装 1 发子弹，每开一次减少一格，保证 N 枪内必定
 | `{threshold}` | 触发阈值（取自 `threshold`） |
 | `{window}` | 窗口秒数（取自 `windowSeconds`） |
 
-默认文案：`{at} 刷屏了！{window} 秒内发送 {count} 条消息，禁言 {time} 冷静一下。`
+默认文案：`{at} 刷屏了！{window}秒内发送了{count}条消息，禁言{time}冷静一下。`
 
 #### 群生效范围模式说明
 

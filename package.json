@@ -1,6 +1,6 @@
 {
     "name": "koishi-plugin-sb6657-bot",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "A Koishi-based QQ bot plugin for sb6657.cn",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -19,6 +19,14 @@
         "sb6657"
     ],
     "author": "9WiSHao",
+    "contributors": [
+        "9WiSHao <825763548@qq.com>"
+    ],
+    "homepage": "https://github.com/9WiSHao/sb6657-bot",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/9WiSHao/sb6657-bot.git"
+    },
     "license": "Apache-2.0",
     "packageManager": "pnpm@10.22.0",
     "peerDependencies": {
