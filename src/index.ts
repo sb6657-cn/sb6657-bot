@@ -14,7 +14,7 @@ export { Config };
 
 export function apply(ctx: Context, config: ConfigType) {
     const logger = ctx.logger('sb6657-bot');
-    logger.info('sb6656烂梗机器人开始初始化');
+    logger.info('sb6657烂梗机器人开始初始化');
 
     // 搜烂梗命令
     useSearchCommand(ctx, config);
