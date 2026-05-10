@@ -37,6 +37,17 @@ export function useVoteMuteCommand(ctx: Context, config: ConfigType) {
         return state;
     };
 
+    // 每次执行命令前，用真实禁言状态同步内存态，避免被外部管理操作或到期自动解禁影响
+    const syncStateByActualMute = async (session: any, guildId: string, targetUserId: string, state: VoteState) => {
+        const actualMuted = await checkUserMutedStatus(session, guildId, targetUserId, logger);
+        if (actualMuted === false && state.mutedByVote) {
+            state.mutedByVote = false;
+            state.muteVotes.clear();
+            state.unmuteVotes.clear();
+        }
+        return actualMuted;
+    };
+
     // 从 <user:user> 参数中提取纯用户 ID（兼容 platform:id 等格式）
     const getTargetUserId = extractUserIdFromUserArg;
 
@@ -48,7 +59,7 @@ export function useVoteMuteCommand(ctx: Context, config: ConfigType) {
 
             const targetUserId = getTargetUserId(user);
             if (!targetUserId) {
-                await sendQuotedByMessageId(session, '🔇 无法解析目标用户。');
+                await sendQuotedByMessageId(session, '🔇 无法解析目标用户。请确定触发群聊的@功能(@后选择成员 or 手机端长按头像 or 电脑端右键用户选择@TA)，直接复制大概率失败。或者可以使用qq号');
                 return;
             }
             if (targetUserId === session.userId) {
@@ -64,9 +75,11 @@ export function useVoteMuteCommand(ctx: Context, config: ConfigType) {
 
             // 按 群:用户 获取投票状态，实现群间隔离
             const targetState = getState(session.guildId, targetUserId);
-            // 防止对已禁言用户重复禁言 / 防止对未禁言用户发起解禁
-            if (targetState.mutedByVote) {
-                await sendQuotedByMessageId(session, '🔇 该用户已被投票禁言，无法再次禁言。');
+            const actualMuted = await syncStateByActualMute(session as any, session.guildId, targetUserId, targetState);
+
+            // 防止对已禁言用户重复禁言（优先看实时状态，失败时回退到内存态）
+            if (actualMuted === true || targetState.mutedByVote) {
+                await sendQuotedByMessageId(session, '🔇 该用户当前已被禁言，无法再次禁言。');
                 return;
             }
             if (targetState.muteVotes.has(session.userId)) {
@@ -106,7 +119,7 @@ export function useVoteMuteCommand(ctx: Context, config: ConfigType) {
 
             const targetUserId = getTargetUserId(user);
             if (!targetUserId) {
-                await sendQuotedByMessageId(session, '🔊 无法解析目标用户。');
+                await sendQuotedByMessageId(session, '🔊 无法解析目标用户。请确定触发群聊的@功能(@后选择成员 or 手机端长按头像 or 电脑端右键用户选择@TA)，直接复制大概率失败。或者可以使用qq号');
                 return;
             }
             if (targetUserId === session.userId) {
@@ -116,17 +129,18 @@ export function useVoteMuteCommand(ctx: Context, config: ConfigType) {
 
             // 按 群:用户 获取投票状态，实现群间隔离
             const targetState = getState(session.guildId, targetUserId);
-            // 防止对已禁言用户重复禁言 / 防止对未禁言用户发起解禁
+            const actualMuted = await syncStateByActualMute(session as any, session.guildId, targetUserId, targetState);
+
+            // 优先按实时状态判断，避免外部解禁后仍按旧状态拦截
+            if (actualMuted === false) {
+                await sendQuotedByMessageId(session, '🔊 该用户当前未被禁言，无需解禁。');
+                return;
+            }
+
+            // 防止对未禁言用户发起无效解禁；enableUnmute=false 时仅允许解禁“投票禁言”的用户
             if (!targetState.mutedByVote && !voteMute.enableUnmute) {
                 await sendQuotedByMessageId(session, '🔊 只能解禁被投票禁言的用户。');
                 return;
-            }
-            if (!targetState.mutedByVote && voteMute.enableUnmute) {
-                const isMuted = await checkUserMutedStatus(session as any, session.guildId, targetUserId, logger);
-                if (isMuted === false) {
-                    await sendQuotedByMessageId(session, '🔊 该用户当前未被禁言，无需解禁。');
-                    return;
-                }
             }
             if (targetState.unmuteVotes.has(session.userId)) {
                 await sendQuotedByMessageId(session, '🔊 你已经投过票了。');

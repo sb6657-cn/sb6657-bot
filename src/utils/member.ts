@@ -1,8 +1,27 @@
-/**
- * 从 <user:user> 参数中提取纯用户 ID（兼容 platform:id 等格式）
- */
+import { h } from 'koishi';
+
 export function extractUserIdFromUserArg(user: string): string | undefined {
-    return user.split(':').pop();
+    if (!user) return;
+    const raw = user.trim();
+    if (!raw) return;
+
+    // 1) 纯数字 QQ 号
+    if (/^\d+$/.test(raw)) return raw;
+
+    // 2) 优先从 @ 元素中提取 ID（最稳定）
+    try {
+        const at = h.select(h.parse(raw), 'at')[0]?.attrs?.id;
+        if (at && /^\d+$/.test(String(at))) return String(at);
+    } catch {
+        /* 解析失败就跳过 */
+    }
+
+    // 3) platform:id 格式（如 onebot:123456）
+    const fromDomain = raw.split(':').pop()?.trim();
+    if (fromDomain && /^\d+$/.test(fromDomain)) return fromDomain;
+
+    // 其余情况（昵称、脏文本等）视为无效，避免误把昵称当 user_id 调用禁言接口
+    return;
 }
 
 const parseMutedByTimestamp = (raw: unknown): boolean | null => {
@@ -34,12 +53,7 @@ const parseMutedFromObject = (payload: Record<string, unknown> | undefined): boo
  * 检查目标用户当前是否处于禁言状态。
  * 返回 true/false 表示明确结果，返回 null 表示无法可靠判断。
  */
-export async function checkUserMutedStatus(
-    session: any,
-    guildId: string,
-    targetUserId: string,
-    logger?: { warn: (...args: any[]) => void }
-): Promise<boolean | null> {
+export async function checkUserMutedStatus(session: any, guildId: string, targetUserId: string, logger?: { warn: (...args: any[]) => void }): Promise<boolean | null> {
     // 优先尝试 OneBot 内部接口（能直接拿到 shut_up_timestamp）
     try {
         const onebot = session.onebot;
