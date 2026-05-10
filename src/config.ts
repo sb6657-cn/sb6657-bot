@@ -1,5 +1,5 @@
 import { Schema } from 'koishi';
-import type { SearchConfig, RandomConfig, RouletteConfig, SleepConfig, RepeatMuteConfig, SpamMuteConfig, ConfigType } from './types/config';
+import type { SearchConfig, RandomConfig, RouletteConfig, SleepConfig, RepeatMuteConfig, SpamMuteConfig, VoteMuteConfig, ConfigType } from './types/config';
 
 // 子配置 Schema —— 每个指令一个面板分组
 const SearchConfig: Schema<SearchConfig> = Schema.object({
@@ -127,9 +127,9 @@ const SpamMuteConfig: Schema<SpamMuteConfig> = Schema.object({
         .default('all')
         .description('群生效范围模式'),
     guilds: Schema.array(Schema.string()).default([]).role('table').description('群号列表（白名单 / 黑名单模式下使用；选择"所有群"时此处填写内容不生效但会保留）'),
-    windowSeconds: Schema.number().min(1).default(10).description('滑动时间窗口大小（秒），无上限。判定"最近 N 秒内"的 N。对应占位符 `{window}`'),
+    windowSeconds: Schema.number().min(1).default(6).description('滑动时间窗口大小（秒），无上限。判定"最近 N 秒内"的 N。对应占位符 `{window}`'),
     threshold: Schema.number().min(2).default(5).description('触发阈值：窗口内发送消息数达到该值即触发禁言。对应占位符 `{threshold}`'),
-    muteSeconds: Schema.number().min(1).default(600).description('触发后禁言时长（秒），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
+    muteSeconds: Schema.number().min(1).default(300).description('触发后禁言时长（秒），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
     msgMute: Schema.string()
         .role('textarea')
         .default('{at} 刷屏了！{window}秒内发送了{count}条消息，禁言{time}冷静一下。')
@@ -137,6 +137,22 @@ const SpamMuteConfig: Schema<SpamMuteConfig> = Schema.object({
             '触发禁言时的提示文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 本次禁言时长（格式化） | `{seconds}` 本次禁言秒数 | `{count}` 本次窗口内实际消息数 | `{threshold}` 触发阈值（取自 threshold） | `{window}` 窗口秒数（取自 windowSeconds）'
         ),
 }).description('🚿 刷屏禁言 · 按用户滑动窗口计数，限制单人短时间连发');
+
+// 🗳️ 投票禁言指令
+const VoteMuteConfig: Schema<VoteMuteConfig> = Schema.object({
+    enabled: Schema.boolean().default(false).description('是否启用投票禁言功能'),
+    guildMode: Schema.union([Schema.const('all'), Schema.const('whitelist'), Schema.const('blacklist')])
+        .default('all')
+        .description('群生效范围模式'),
+    guilds: Schema.array(Schema.string()).default([]).role('table').description('群号列表（白名单/黑名单模式下生效）'),
+    muteNeedsVotes: Schema.number().min(1).default(5).description('禁言所需票数'),
+    unmuteNeedsVotes: Schema.number().min(1).default(5).description('解禁所需票数'),
+    muteSeconds: Schema.number()
+        .min(1)
+        .default(60 * 60)
+        .description('投票禁言时长（秒）'),
+    enableUnmute: Schema.boolean().default(false).description('是否允许投票解禁管理员禁言用户'),
+}).description('🗳️ 投票禁言/解禁指令');
 
 // 顶层 Schema
 export const Config: Schema<ConfigType> = Schema.object({
@@ -146,4 +162,5 @@ export const Config: Schema<ConfigType> = Schema.object({
     sleep: SleepConfig,
     repeatMute: RepeatMuteConfig,
     spamMute: SpamMuteConfig,
+    voteMute: VoteMuteConfig,
 });

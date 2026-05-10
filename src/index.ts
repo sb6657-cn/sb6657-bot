@@ -8,6 +8,7 @@ import { useRouletteCommand } from './commands/roulette';
 import { useSleepCommand } from './commands/sleep';
 import { useRepeatMuteCommand } from './commands/repeatMute';
 import { useSpamMuteCommand } from './commands/spamMute';
+import { useVoteMuteCommand } from './commands/voteMute';
 
 export const name = 'sb6657-bot';
 export { Config };
@@ -28,6 +29,8 @@ export function apply(ctx: Context, config: ConfigType) {
     useRepeatMuteCommand(ctx, config);
     // 刷屏禁言（被动监听器）
     useSpamMuteCommand(ctx, config);
+    // 投票禁言命令
+    useVoteMuteCommand(ctx, config);
     // TODO 投稿命令
 
     // TODO 布雷德十五勇士命令

@@ -41,3 +41,12 @@ export interface RepeatState {
 
 /** 单个用户的发言时间戳滑动窗口（毫秒时间戳升序数组） */
 export type SpamWindow = number[];
+
+// ===== 🗳️ 投票禁言 —— 运行时状态 =====
+
+/** 单个目标用户在单个群内的投票状态（按 guildId:userId 维度存储） */
+export interface VoteState {
+    muteVotes: Set<string>;
+    unmuteVotes: Set<string>;
+    mutedByVote: boolean;
+}

@@ -69,6 +69,17 @@ export interface SpamMuteConfig {
     msgMute: string;
 }
 
+/** 🗳️ 投票禁言配置 */
+export interface VoteMuteConfig {
+    enabled: boolean;
+    guildMode: 'all' | 'whitelist' | 'blacklist';
+    guilds: string[];
+    muteNeedsVotes: number;
+    unmuteNeedsVotes: number;
+    muteSeconds: number;
+    enableUnmute: boolean;
+}
+
 /** 顶层配置 —— 按指令分组
  *  注意：这里故意不叫 `Config`，因为 `Config` 这个名字留给 config.ts 里的 Schema 值
  */
@@ -79,4 +90,5 @@ export interface ConfigType {
     sleep: SleepConfig;
     repeatMute: RepeatMuteConfig;
     spamMute: SpamMuteConfig;
+    voteMute: VoteMuteConfig;
 }
