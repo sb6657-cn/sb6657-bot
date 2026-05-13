@@ -42,6 +42,16 @@ export interface RepeatState {
 /** 单个用户的发言时间戳滑动窗口（毫秒时间戳升序数组） */
 export type SpamWindow = number[];
 
+/** 单个用户"连续发送相同内容"的滑动窗口状态
+ *  - content：当前正在被重复的消息内容
+ *  - timestamps：内容相同期间的发送时间戳（毫秒，升序）
+ *  一旦遇到不同内容就会被重置为新内容、timestamps 清空后塞入当前时间戳。
+ */
+export interface SpamSameContentState {
+    content: string;
+    timestamps: number[];
+}
+
 // ===== 🗳️ 投票禁言 —— 运行时状态 =====
 
 /** 单个目标用户在单个群内的投票状态（按 guildId:userId 维度存储） */

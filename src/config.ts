@@ -105,7 +105,7 @@ const RepeatMuteConfig: Schema<RepeatMuteConfig> = Schema.object({
         .default('all')
         .description('群生效范围模式'),
     guilds: Schema.array(Schema.string()).default([]).role('table').description('群号列表（白名单 / 黑名单模式下使用；选择"所有群"时此处填写内容不生效但会保留）'),
-    minTimes: Schema.number().min(1).default(8).description('触发禁言所需的最少重复次数。对应占位符 `{times}`'),
+    minTimes: Schema.number().min(1).default(10).description('触发禁言所需的最少重复次数。对应占位符 `{times}`'),
     muteSeconds: Schema.number().min(1).default(60).description('基础禁言时长（秒），无上限。最终禁言时长 = 此值 × 随机倍率。对应占位符 `{baseSeconds}`'),
     maxDurationMultiplier: Schema.number().min(1).default(5).description('随机禁言倍率的上限（1 ~ 该值随机取整数），无上限。对应占位符 `{multiplier}`'),
     msgMute: Schema.string()
@@ -127,16 +127,32 @@ const SpamMuteConfig: Schema<SpamMuteConfig> = Schema.object({
         .default('all')
         .description('群生效范围模式'),
     guilds: Schema.array(Schema.string()).default([]).role('table').description('群号列表（白名单 / 黑名单模式下使用；选择"所有群"时此处填写内容不生效但会保留）'),
-    windowSeconds: Schema.number().min(1).default(6).description('滑动时间窗口大小（秒），无上限。判定"最近 N 秒内"的 N。对应占位符 `{window}`'),
-    threshold: Schema.number().min(2).default(5).description('触发阈值：窗口内发送消息数达到该值即触发禁言。对应占位符 `{threshold}`'),
-    muteSeconds: Schema.number().min(1).default(300).description('触发后禁言时长（秒），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
+    windowSeconds: Schema.number().min(1).default(6).description('【频率计数器】滑动时间窗口大小（秒），无上限。判定"最近 N 秒内"的 N。对应占位符 `{window}`'),
+    threshold: Schema.number().min(2).default(5).description('【频率计数器】触发阈值：窗口内发送消息数达到该值即触发禁言。对应占位符 `{threshold}`'),
+    muteSeconds: Schema.number().min(1).default(300).description('【频率计数器】触发后禁言时长（秒），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
     msgMute: Schema.string()
         .role('textarea')
         .default('{at} 刷屏了！{window}秒内发送了{count}条消息，禁言{time}冷静一下。')
         .description(
-            '触发禁言时的提示文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 本次禁言时长（格式化） | `{seconds}` 本次禁言秒数 | `{count}` 本次窗口内实际消息数 | `{threshold}` 触发阈值（取自 threshold） | `{window}` 窗口秒数（取自 windowSeconds）'
+            '【频率计数器】触发禁言时的提示文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 本次禁言时长（格式化） | `{seconds}` 本次禁言秒数 | `{count}` 本次窗口内实际消息数 | `{threshold}` 触发阈值（取自 threshold） | `{window}` 窗口秒数（取自 windowSeconds）'
         ),
-}).description('🚿 刷屏禁言 · 按用户滑动窗口计数，限制单人短时间连发');
+    sameContentEnabled: Schema.boolean().default(false).description('【相同内容计数器】是否启用"连续发送相同内容"独立检测（与频率计数器互不影响，可单独开关）'),
+    sameContentWindowSeconds: Schema.number()
+        .min(1)
+        .default(5 * 60)
+        .description('【相同内容计数器】滑动时间窗口大小（秒），默认 300 秒（5 分钟），无上限。一旦用户发送了不同内容，本计数器会重置为新内容。对应占位符 `{window}`'),
+    sameContentThreshold: Schema.number().min(2).default(3).description('【相同内容计数器】触发阈值：窗口内连续发送相同内容次数达到该值即触发禁言。对应占位符 `{threshold}`'),
+    sameContentMuteSeconds: Schema.number()
+        .min(1)
+        .default(10 * 60)
+        .description('【相同内容计数器】触发后禁言时长（秒），默认 600 秒（10 分钟），无上限。对应占位符 `{time}`（格式化后） / `{seconds}`（原始秒数）'),
+    msgSameContentMute: Schema.string()
+        .role('textarea')
+        .default('{at} 刷屏了！{window}秒内连续发送了{count}条相同内容，禁言{time}冷静一下。')
+        .description(
+            '【相同内容计数器】触发禁言时的提示文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 本次禁言时长（格式化） | `{seconds}` 本次禁言秒数 | `{count}` 本次窗口内连续相同内容数 | `{threshold}` 触发阈值（取自 sameContentThreshold） | `{window}` 窗口秒数（取自 sameContentWindowSeconds）'
+        ),
+}).description('🚿 刷屏禁言 · 按用户独立计数，含「频率」与「相同内容」两个互不干扰的检测器');
 
 // 🗳️ 投票禁言指令
 const VoteMuteConfig: Schema<VoteMuteConfig> = Schema.object({
@@ -149,7 +165,7 @@ const VoteMuteConfig: Schema<VoteMuteConfig> = Schema.object({
     unmuteNeedsVotes: Schema.number().min(1).default(5).description('解禁所需票数'),
     muteSeconds: Schema.number()
         .min(1)
-        .default(60 * 60)
+        .default(60 * 60 * 24) // 24小时
         .description('投票禁言时长（秒）'),
     enableUnmute: Schema.boolean().default(false).description('是否允许投票解禁管理员禁言用户'),
 }).description('🗳️ 投票禁言/解禁指令');

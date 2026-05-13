@@ -58,7 +58,11 @@ export interface RepeatMuteConfig {
     msgMute: string;
 }
 
-/** 🚿 刷屏禁言 —— 被动监听器配置（按用户滑动窗口计数） */
+/** 🚿 刷屏禁言 —— 被动监听器配置（按用户滑动窗口计数）
+ *  内置两个相互独立的计数器：
+ *   1. 频率计数器：windowSeconds 内消息总数 ≥ threshold 即触发
+ *   2. 相同内容计数器：sameContentWindowSeconds 内连续发送相同内容次数 ≥ sameContentThreshold 即触发
+ */
 export interface SpamMuteConfig {
     enabled: boolean;
     guildMode: 'all' | 'whitelist' | 'blacklist';
@@ -67,6 +71,11 @@ export interface SpamMuteConfig {
     threshold: number;
     muteSeconds: number;
     msgMute: string;
+    sameContentEnabled: boolean;
+    sameContentWindowSeconds: number;
+    sameContentThreshold: number;
+    sameContentMuteSeconds: number;
+    msgSameContentMute: string;
 }
 
 /** 🗳️ 投票禁言配置 */
