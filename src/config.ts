@@ -141,7 +141,7 @@ const SpamMuteConfig: Schema<SpamMuteConfig> = Schema.object({
         .min(1)
         .default(5 * 60)
         .description('【相同内容计数器】滑动时间窗口大小（秒），默认 300 秒（5 分钟），无上限。一旦用户发送了不同内容，本计数器会重置为新内容。对应占位符 `{window}`'),
-    sameContentThreshold: Schema.number().min(2).default(3).description('【相同内容计数器】触发阈值：窗口内连续发送相同内容次数达到该值即触发禁言。对应占位符 `{threshold}`'),
+    sameContentThreshold: Schema.number().min(2).default(5).description('【相同内容计数器】触发阈值：窗口内连续发送相同内容次数达到该值即触发禁言。对应占位符 `{threshold}`'),
     sameContentMuteSeconds: Schema.number()
         .min(1)
         .default(10 * 60)
