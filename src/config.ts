@@ -47,7 +47,7 @@ const RouletteConfig: Schema<RouletteConfig> = Schema.intersect([
                 .description('中弹文案。可用占位符：`{at}` 艾特触发用户 | `{time}` 本次禁言时长（格式化） | `{seconds}` 本次禁言秒数'),
             msgNewRound: Schema.string()
                 .role('textarea')
-                .default('加油吧{at} ，我们科隆major干回来。下一轮初始禁言时长为{time}')
+                .default('加油吧{at} ，我们新加坡major干回来。下一轮初始禁言时长为{time}')
                 .description('中弹后追加的新一轮文案（留空则不发）。可用占位符：`{at}` 艾特触发用户 | `{time}` 下一轮初始时长（格式化，取自 initTime） | `{seconds}` 下一轮初始秒数'),
             msgMiss: Schema.string()
                 .role('textarea')

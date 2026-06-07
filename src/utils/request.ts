@@ -15,6 +15,13 @@ interface BaseResponse<T = any> {
     data: T;
 }
 
+// 后端用于统计请求来源
+const REQUEST_OPTIONS = {
+    headers: {
+        dpahjdoiaw: 'qq_bot',
+    },
+};
+
 /**
  * 核心请求工具 (扁平化错误处理)
  * * @description 内部已接管所有的 try...catch 和非 200 状态码判断。
@@ -28,7 +35,7 @@ export async function post<REQ, RES = any>(ctx: Context, req: Req<REQ>): Promise
         _failure: false,
     };
     try {
-        const res = await ctx.http.post<BaseResponse<RES>>(req.url, req.data);
+        const res = await ctx.http.post<BaseResponse<RES>>(req.url, req.data, REQUEST_OPTIONS);
         if (res.code === 200) {
             result.flatData = res.data;
         } else {
@@ -48,7 +55,7 @@ export async function get<RES = any>(ctx: Context, url: string): Promise<Res<RES
         _failure: false,
     };
     try {
-        const res = await ctx.http.get<BaseResponse<RES>>(url);
+        const res = await ctx.http.get<BaseResponse<RES>>(url, REQUEST_OPTIONS);
         if (res.code === 200) {
             result.flatData = res.data;
         } else {
