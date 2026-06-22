@@ -5,7 +5,7 @@ import type { SearchConfig, RandomConfig, RouletteConfig, SleepConfig, RepeatMut
 const SearchConfig: Schema<SearchConfig> = Schema.object({
     enabled: Schema.boolean().default(false).description('是否启用本指令'),
     minInterval: Schema.number().default(1000).description('指令触发的冷却时间 (毫秒)'),
-    defaultMaxUsage: Schema.number().default(50).description('普通群友每天的默认搜索次数'),
+    defaultMaxUsage: Schema.number().default(30).description('普通群友每天的默认搜索次数'),
     customLimits: Schema.array(
         Schema.object({
             userId: Schema.string().required().description('需要提权的 QQ 号'),
