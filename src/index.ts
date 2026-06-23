@@ -4,6 +4,7 @@ import type { ConfigType } from './types/config';
 
 import { useSearchCommand } from './commands/search';
 import { useRandomCommand } from './commands/random';
+import { useHotMemesCommand } from './commands/hotMemes';
 import { useRouletteCommand } from './commands/roulette';
 import { useSleepCommand } from './commands/sleep';
 import { useRepeatMuteCommand } from './commands/repeatMute';
@@ -21,6 +22,8 @@ export function apply(ctx: Context, config: ConfigType) {
     useSearchCommand(ctx, config);
     // 随机一条烂梗命令
     useRandomCommand(ctx, config);
+    // 热门烂梗命令（包括 热门24h 热门7d 两个命令）
+    useHotMemesCommand(ctx, config);
     // 开枪（俄罗斯轮盘赌）命令
     useRouletteCommand(ctx, config);
     // 睡觉命令

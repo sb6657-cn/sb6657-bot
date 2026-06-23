@@ -1,5 +1,5 @@
 import { Context } from 'koishi';
-import type { searchMeme_req, searchMeme_res, RandomMeme } from './types/api';
+import type { searchMeme_req, searchMeme_res, RandomMeme, hotMemes_res } from './types/api';
 import { Res, post, get } from './utils/request';
 
 const BACK_END_URL = 'https://hguofichp.cn:10086';
@@ -19,4 +19,11 @@ export async function searchMemes(ctx: Context, keyword: string): Promise<Res<se
 
 export async function getRandomMeme(ctx: Context): Promise<Res<RandomMeme>> {
     return await get(ctx, `${BACK_END_URL}/machine/getRandOne`);
+}
+
+export async function getHotMemes24h(ctx: Context): Promise<Res<hotMemes_res[]>> {
+    return await get(ctx, `${BACK_END_URL}/machine/hotBarrageOf24H`);
+}
+export async function getHotMemes7d(ctx: Context): Promise<Res<hotMemes_res[]>> {
+    return await get(ctx, `${BACK_END_URL}/machine/hotBarrageOf7Day`);
 }

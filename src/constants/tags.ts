@@ -155,4 +155,11 @@ export const tags = [
         dictType: 'machine_tags',
         iconUrl: null,
     },
+    {
+        dictCode: null,
+        dictLabel: '\uD83D\uDDFF\uD83D\uDDFF\uD83D\uDDFF',
+        dictValue: '27',
+        dictType: 'machine_tags',
+        iconUrl: null,
+    },
 ];

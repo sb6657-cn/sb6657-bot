@@ -12,6 +12,12 @@ export interface RandomConfig {
     minInterval: number;
 }
 
+/** 🔥 热门烂梗 指令配置 */
+export interface HotMemesConfig {
+    enabled: boolean;
+    minInterval: number;
+}
+
 /** 🔫 开枪 指令 —— 两种模式互斥 */
 export type RouletteMode =
     | {
@@ -95,6 +101,7 @@ export interface VoteMuteConfig {
 export interface ConfigType {
     search: SearchConfig;
     random: RandomConfig;
+    hotMemes: HotMemesConfig;
     roulette: RouletteConfig;
     sleep: SleepConfig;
     repeatMute: RepeatMuteConfig;

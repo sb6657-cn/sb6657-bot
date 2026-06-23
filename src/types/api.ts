@@ -34,3 +34,13 @@ export interface RandomMeme {
     likes: string;
     submitTime: string;
 }
+
+/** 时段热门烂梗相关类型 */
+export interface hotMemes_res {
+    id: null;
+    barrageId: string;
+    barrage: string;
+    cnt: string;
+    tags: string;
+    hotDateTime: string;
+}

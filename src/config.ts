@@ -1,5 +1,5 @@
 import { Schema } from 'koishi';
-import type { SearchConfig, RandomConfig, RouletteConfig, SleepConfig, RepeatMuteConfig, SpamMuteConfig, VoteMuteConfig, ConfigType } from './types/config';
+import type { SearchConfig, RandomConfig, HotMemesConfig, RouletteConfig, SleepConfig, RepeatMuteConfig, SpamMuteConfig, VoteMuteConfig, ConfigType } from './types/config';
 
 // 子配置 Schema —— 每个指令一个面板分组
 const SearchConfig: Schema<SearchConfig> = Schema.object({
@@ -20,6 +20,11 @@ const RandomConfig: Schema<RandomConfig> = Schema.object({
     enabled: Schema.boolean().default(false).description('是否启用本指令'),
     minInterval: Schema.number().default(1000).description('指令触发的冷却时间 (毫秒)'),
 }).description('🎲 随机烂梗 指令');
+
+const HotMemesConfig: Schema<HotMemesConfig> = Schema.object({
+    enabled: Schema.boolean().default(false).description('是否启用本指令'),
+    minInterval: Schema.number().default(1000).description('指令触发的冷却时间 (毫秒)'),
+}).description('🔥 热门烂梗 指令');
 
 // 🔫 开枪 —— 基础字段 + 模式互斥字段
 const RouletteConfig: Schema<RouletteConfig> = Schema.intersect([
@@ -174,6 +179,7 @@ const VoteMuteConfig: Schema<VoteMuteConfig> = Schema.object({
 export const Config: Schema<ConfigType> = Schema.object({
     search: SearchConfig,
     random: RandomConfig,
+    hotMemes: HotMemesConfig,
     roulette: RouletteConfig,
     sleep: SleepConfig,
     repeatMute: RepeatMuteConfig,
