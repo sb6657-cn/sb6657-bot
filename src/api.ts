@@ -2,7 +2,7 @@ import { Context } from 'koishi';
 import type { searchMeme_req, searchMeme_res, RandomMeme, hotMemes_res } from './types/api';
 import { Res, post, get } from './utils/request';
 
-const BACK_END_URL = 'https://hguofichp.cn:10086';
+const BACK_END_URL = 'https://api.hguofichp.cn';
 
 export async function searchMemes(ctx: Context, keyword: string): Promise<Res<searchMeme_res>> {
     const payload: searchMeme_req = {
